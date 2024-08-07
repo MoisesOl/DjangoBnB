@@ -20,6 +20,11 @@ ALLOWED_HOSTS = os.environ.get("DJANGO_ALLOWED_HOSTS").split(" ")
 
 AUTH_USER_MODEL = 'useraccount.User'
 
+AUTHENTICATION_BACKENDS = (
+    'django.contrib.auth.backends.ModelBackend',  # Para autenticación de Django
+    'allauth.account.auth_backends.AuthenticationBackend',  # Para autenticación de allauth
+)
+
 SITE_ID = 1
 
 WEBSITE_URL = 'http://localhost:8000'
@@ -41,12 +46,12 @@ ACCOUNT_AUTHENTICATION_METHOD = 'email'
 ACCOUNT_EMAIL_VERIFICATION = 'none'
 
 REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework_simplejwt.authentication.JWTAuthentication',
-    },
-    'DEFAULT_PERMISSION_CLASSES': {
+    ],
+    'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticated',
-    }
+    ],
 }
 
 CORS_ALLOWED_ORIGINS = [
@@ -75,6 +80,7 @@ INSTALLED_APPS = [
     
     'allauth',
     'allauth.account',
+    'allauth.socialaccount',
     
     'dj_rest_auth',
     'dj_rest_auth.registration',
@@ -102,7 +108,7 @@ ROOT_URLCONF = 'djangobnb_backend.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [

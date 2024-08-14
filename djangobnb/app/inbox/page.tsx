@@ -11,7 +11,7 @@ export type UserType = {
 
 export type ConversationType = {
     id: string;
-    users: UserType;
+    users: UserType[];
 }
 
 const InboxPage = async () => {
@@ -35,7 +35,10 @@ const InboxPage = async () => {
 
             {conversations.map((conversation: ConversationType) => {
                 return (
-                    <Conversation />
+                    <Conversation
+                        userId={userId}
+                        conversation={conversation}
+                    />
 
                 )
             })}

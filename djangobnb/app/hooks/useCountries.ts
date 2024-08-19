@@ -2,7 +2,7 @@ import countries from 'world-countries';
 
 const formattedCountries = countries.map((country) => ({
     value: country.cca2,
-    label: country.name.common,
+    label: country.translations.spa.common, // Nombre del país en español
 }));
 
 const useCountries = () => {

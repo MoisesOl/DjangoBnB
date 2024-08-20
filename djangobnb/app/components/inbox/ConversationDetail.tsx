@@ -80,7 +80,7 @@ const ConversationDetail: React.FC<ConversationDetailProps> = ({
         <div>
             <div 
                 ref={messagesDiv}
-                className="max-h-[400px] overflow-auto flex flex-col space-y-4"
+                className="max-h-[800px] overflow-auto flex flex-col space-y-4"
             >
                 {messages.map((message, index) => (
                     <div

@@ -13,7 +13,7 @@ const MyFavoritesPage = async () => {
     } 
 
     return (
-        <main className="max-w-[1500px] max-auto px-6 pb-12">
+        <main className="max-w-[1500px] mx-auto px-6 pb-12">
             <h1 className="my-6 text-2xl">
                 Mis Favoritos
             </h1>

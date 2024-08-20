@@ -12,8 +12,12 @@ const Categories: React.FC<CategoriesProps> = ({
     return (
         <div className="pt-3 cursor-pointer pb-6 flex items-center space-x-12">
             <div 
-                onClick={() => setCategory('iconicos')}
-                className={`pb-4 flex flex-col items-center space-y-2 border-b-2 ${dataCategory === 'Iconicos' ? 'border-gray-800 opacity-100' : 'border-white opacity-60'} hover:border-gray-200`}
+                onClick={() => setCategory('iconico')}
+                className={`pb-4 flex flex-col items-center space-y-2 border-b-2 ${
+                    dataCategory === 'iconico' 
+                        ? 'border-gray-800 opacity-100'
+                        : 'border-white opacity-60 hover:border-gray-200'
+                }`}
             >
                 <Image 
                     src="/icn_categoria_iconicos.webp"
@@ -25,8 +29,12 @@ const Categories: React.FC<CategoriesProps> = ({
             </div>
 
             <div 
-                onClick={() => setCategory('cabañas')}
-                className={`pb-4 flex flex-col items-center space-y-2 border-b-2 ${dataCategory === 'Cabañas' ? 'border-gray-800 opacity-100' : 'border-white opacity-60'} hover:border-gray-200`}
+                onClick={() => setCategory('cabaña')}
+                className={`pb-4 flex flex-col items-center space-y-2 border-b-2 ${
+                    dataCategory === 'cabaña' 
+                        ? 'border-gray-800 opacity-100'
+                        : 'border-white opacity-60 hover:border-gray-200'
+                }`}
             >
                 <Image 
                     src="/icn_categoria_cabañas.webp"
@@ -39,11 +47,15 @@ const Categories: React.FC<CategoriesProps> = ({
 
             <div 
                 onClick={() => setCategory('playa')}
-                className={`pb-4 flex flex-col items-center space-y-2 border-b-2 ${dataCategory === 'Frente a la playa' ? 'border-gray-800 opacity-100' : 'border-white opacity-60'} hover:border-gray-200`}
+                className={`pb-4 flex flex-col items-center space-y-2 border-b-2 ${
+                    dataCategory === 'playa' 
+                        ? 'border-gray-800 opacity-100'
+                        : 'border-white opacity-60 hover:border-gray-200'
+                }`}
             >
                 <Image 
                     src="/icn_categoria_frente_a_la_playa.webp"
-                    alt="Categoría - Frente a la playa"
+                    alt="Categoría - Playa"
                     width={20}
                     height={20}
                 />

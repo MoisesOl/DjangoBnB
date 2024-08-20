@@ -6,6 +6,7 @@ import { useSearchParams } from "next/navigation";
 import PropertyListItem from "./PropertyListItem";
 import apiService from "@/app/services/apiService";
 import useSearchModal from "@/app/hooks/useSearchModal";
+import { formatCurrency } from "../utils/formatCurrency";
 
 export type PropertyType = {
     id: string;
@@ -35,29 +36,19 @@ const PropertyList: React.FC<PropertyListProps> = ({
     const category = searchModal.query.category;
     const [properties, setProperties] = useState<PropertyType[]>([]);
 
-    console.log('searchQuery:', searchModal.query);
-    console.log('country:', country);
-    console.log('numGuests:', numGuests);
-    console.log('numBedrooms:', numBedrooms);
-    
-
-    const markFavorite = (id: string, is_favorite: boolean) => {
-        const tmpProperties = properties.map((property: PropertyType) => {
-            if (property.id == id) {
-                property.is_favorite = is_favorite
-            
-                if (is_favorite) {
-                    console.log('Añadido a favoritos')
-                } else {
-                    console.log('Quitado de favoritos')
-                }
+    const markFavorite = async (id: string, is_favorite: boolean) => {
+        const updatedProperties = properties.map((property: PropertyType) => {
+            if (property.id === id) {
+                property.is_favorite = is_favorite;
             }
-
             return property;
+        });
 
-        })
+        setProperties(updatedProperties);
 
-        setProperties(tmpProperties);
+        if (!is_favorite) {
+            await getProperties();
+        }
     };
 
     const getProperties = async () => {
@@ -99,38 +90,34 @@ const PropertyList: React.FC<PropertyListProps> = ({
             }
 
             if (urlQuery.length) {
-                console.log('Query:', urlQuery);
-
                 urlQuery = '?' + urlQuery.substring(1);
-
                 url += urlQuery;
             }
         }
 
         const tmpProperties = await apiService.get(url);
 
-        setProperties(tmpProperties.data.map((property: PropertyType)=> {
+        setProperties(tmpProperties.data.map((property: PropertyType) => {
             if (tmpProperties.favorites.includes(property.id)) {
                 property.is_favorite = true;
             } else {
                 property.is_favorite = false;
             }
-
             return property;
         }));
     };
 
     useEffect(() => {
         getProperties();
-    }, [category, searchModal.query, params]);  // Dependencia de landlord_id para actualizar los datos
+    }, [category, searchModal.query, params, favorites]);
 
     return (
         <>
             {properties.map((property) => (
                 <PropertyListItem
                     key={property.id}
-                    property={property}
-                    markFavorite={(is_favorite: any) => markFavorite(property.id, is_favorite)}
+                    property={property} // Pasa la propiedad sin formatear
+                    markFavorite={(is_favorite: boolean) => markFavorite(property.id, is_favorite)}
                 />
             ))}
         </>
@@ -138,3 +125,4 @@ const PropertyList: React.FC<PropertyListProps> = ({
 }
 
 export default PropertyList;
+

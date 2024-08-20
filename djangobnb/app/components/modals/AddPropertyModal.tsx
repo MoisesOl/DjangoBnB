@@ -65,6 +65,7 @@ const AddPropertyModal = () => {
 
             if (response.success) {
                 router.push('/?added=true');
+                router.refresh(); // Refresca la página después de redirigir
                 addPropertyModal.close();
             } else {
                 console.log('Error');

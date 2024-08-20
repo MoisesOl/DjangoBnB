@@ -29,7 +29,8 @@ const LoginModal = () => {
             
             loginModal.close();
 
-            router.push('/')
+            router.push('/'); // Redirige al home
+            router.refresh(); // Refresca el estado actual del cliente
         } else {
             setErrors(response.non_field_errors);
         }

@@ -2,10 +2,11 @@
 
 import { useState, useEffect } from 'react';
 import { Range } from 'react-date-range';
-import { differenceInDays, eachDayOfInterval, endOfDay, format  } from 'date-fns';
+import { differenceInDays, eachDayOfInterval, format } from 'date-fns';
 import DatePicker from '../forms/Calendar';
 import apiService from '@/app/services/apiService';
 import useLoginModal from '@/app/hooks/useLoginModal';
+import { formatCurrency } from '../utils/formatCurrency';
 
 const initialDateRange = {
     startDate: new Date(),
@@ -37,32 +38,33 @@ const ReservationSidebar: React.FC<ReservationSidebarProps> = ({
     const [minDate, setMinDate] = useState<Date>(new Date());
     const [bookedDates, setBookedDates] = useState<Date[]>([]);
     const [guests, setGuests] = useState<string>('1');
-    const guestsRange = Array.from({ length: property.guests }, (_, index) => index + 1)
+    const [reservationUpdated, setReservationUpdated] = useState<boolean>(false); // Track reservation update
+
+    const guestsRange = Array.from({ length: property.guests }, (_, index) => index + 1);
 
     const performBooking = async () => {
         if (userId) {
-            if(dateRange.startDate && dateRange.endDate){
+            if (dateRange.startDate && dateRange.endDate) {
                 const formData = new FormData();
                 formData.append('guests', guests);
                 formData.append('start_date', format(dateRange.startDate, 'yyyy-MM-dd'));
                 formData.append('end_date', format(dateRange.endDate, 'yyyy-MM-dd'));
                 formData.append('number_of_nights', nights.toString());
                 formData.append('total_price', totalPrice.toString());
-                
-
 
                 console.log('Form Data:', Array.from(formData.entries())); // Verifica el contenido de formData
 
                 const response = await apiService.post(`/api/properties/${property.id}/book/`, formData);
-            
-                if (response.success){
-                    console.log('Booking realizado correctamente')
+
+                if (response.success) {
+                    console.log('Booking realizado correctamente');
+                    setReservationUpdated(prev => !prev); // Trigger state change to refetch reservations
                 } else {
-                    console.log('Algo ha ido mal')
+                    console.log('Algo ha ido mal');
                 }
             }
         } else {
-            loginModal.open()
+            loginModal.open();
         }
     }
 
@@ -70,7 +72,7 @@ const ReservationSidebar: React.FC<ReservationSidebarProps> = ({
         const newStartDate = new Date(selection.startDate);
         const newEndDate = new Date(selection.endDate);
 
-        if(newEndDate <= newStartDate) {
+        if (newEndDate <= newStartDate) {
             newEndDate.setDate(newStartDate.getDate() + 1);
         }
 
@@ -78,64 +80,71 @@ const ReservationSidebar: React.FC<ReservationSidebarProps> = ({
             ...dateRange,
             startDate: newStartDate,
             endDate: newEndDate
-        })
+        });
     }
 
     const getReservations = async () => {
-        const reservations = await apiService.get(`/api/properties/${property.id}/reservations`)
+        try {
+            const reservations = await apiService.get(`/api/properties/${property.id}/reservations`);
 
-        let dates: Date[] = [];
+            let dates: Date[] = [];
 
-        reservations.forEach((reservations: any) => {
-            const range = eachDayOfInterval({
-                start: new Date(reservations.start_date),
-                end: new Date(reservations.end_date)
+            reservations.forEach((reservation: any) => {
+                const range = eachDayOfInterval({
+                    start: new Date(reservation.start_date),
+                    end: new Date(reservation.end_date)
+                });
+
+                dates = [...dates, ...range];
             });
 
-            dates = [...dates, ...range];
-        })
-
-        setBookedDates(dates);
+            setBookedDates(dates);
+        } catch (error) {
+            console.error('Error fetching reservations:', error);
+        }
     }
 
     useEffect(() => {
         getReservations();
-        
-        if(dateRange.startDate && dateRange.endDate) {
-            const dayCount = differenceInDays (
+    }, [reservationUpdated]); // Refetch reservations when reservationUpdated changes
+
+    useEffect(() => {
+        if (dateRange.startDate && dateRange.endDate) {
+            const dayCount = differenceInDays(
                 dateRange.endDate,
                 dateRange.startDate
             );
+    
             console.log("dayCount:", dayCount);
-
+    
             if (dayCount && property.price_per_night) {
                 const _fee = ((dayCount * property.price_per_night) / 100) * 5;
-
+    
                 setFee(_fee);
                 setTotalPrice((dayCount * property.price_per_night) + _fee);
                 setNights(dayCount);
                 console.log("nights set to:", dayCount);
             } else {
                 const _fee = (property.price_per_night / 100) * 5;
-
+    
                 setFee(_fee);
                 setTotalPrice(property.price_per_night + _fee);
                 setNights(1);
             }
         }
-    }, [dateRange])
-
+    }, [dateRange, property.price_per_night]);
+    
 
     return (
         <aside className="mt-6 p-6 col-span-2 rounded-xl border border-gray-300 shadow-xl">
-            <h2 className="mb-5 text-2xl">${property.price_per_night} por noche</h2>
-
+            <h2 className="mb-5 text-2xl">${formatCurrency(property.price_per_night)} por noche</h2>
+    
             <DatePicker 
                 value={dateRange}
                 bookedDates={bookedDates}
                 onChange={(value) => _setDateRange(value.selection)}
             />
-
+    
             <div className="mb-6 p-3 border border-gray-400 rounded-xl">
                 <label className="block font-bold text-xs">HUÉSPEDES</label>
                 
@@ -149,31 +158,31 @@ const ReservationSidebar: React.FC<ReservationSidebarProps> = ({
                     ))}
                 </select>
             </div>
-
+    
             <div
                 onClick={performBooking}
                 className="w-full mb-6 py-6 text-center text-white bg-airbnb hover:bg-airbnb-dark rounded-xl">
                 Reserva
             </div>
-
+    
             <div className="mb-4 flex justify-between align-center">
-                <p>${property.price_per_night} x {nights} noches</p>
-
-                <p>${property.price_per_night}</p>
+                <p>${formatCurrency(property.price_per_night)} x {nights} noches</p>
+    
+                <p>${formatCurrency(property.price_per_night * nights)}</p> {/* Mostrar el total base */}
             </div>
-
+    
             <div className="mb-4 flex justify-between align-center">
                 <p>Tarifa por servicio de DjangoBnB</p>
-
-                <p>${fee}</p>
+    
+                <p>${formatCurrency(fee)}</p>
             </div>
-
+    
             <hr />
-
+    
             <div className="mt-4 flex justify-between align-center font-bold">
                 <p>Total</p>
-
-                <p>${totalPrice}</p>
+    
+                <p>${formatCurrency(totalPrice)}</p>
             </div>
         </aside>
     )

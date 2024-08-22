@@ -3,3 +3,25 @@
 @tailwind utilities;
 
 
+@layer components {
+  .custom-date-range .rdrCalendarWrapper {
+    @apply flex flex-col h-full w-full;
+  }
+
+  .custom-date-range .rdrMonths {
+    @apply flex-1 grid grid-cols-1 w-full;
+  }
+
+  .custom-date-range .rdrMonth {
+    @apply flex-1 w-full;
+  }
+
+  .custom-date-range .rdrDays {
+    @apply grid grid-cols-7 h-full w-full;
+  }
+
+  .custom-date-range .rdrDay {
+    @apply flex justify-center items-center w-full;
+    height: 3rem; /* Ajusta esta altura según tus necesidades */
+  }
+}

@@ -80,7 +80,7 @@ const ConversationDetail: React.FC<ConversationDetailProps> = ({
         <div>
             <div 
                 ref={messagesDiv}
-                className="max-h-[800px] overflow-auto flex flex-col space-y-4"
+                className="max-h-[680px] overflow-auto flex flex-col space-y-4"
             >
                 {messages.map((message, index) => (
                     <div
@@ -116,7 +116,7 @@ const ConversationDetail: React.FC<ConversationDetailProps> = ({
                 <CustomButton
                     label='Enviar'
                     onClick={sendMessage}
-                    className="w-[100px]"
+                    className="max-w-[100px]"
                 />
             </div>
         </div>
